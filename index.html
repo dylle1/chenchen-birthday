@@ -6,34 +6,48 @@
 <title>🎂</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
 body{display:flex;align-items:center;justify-content:center}
 video{width:100%;height:100%;object-fit:contain;background:#000}
 </style>
 </head>
 <body>
-<video id="v" autoplay playsinline preload="auto" style="width:100%;height:100%;object-fit:contain">
-<source src="https://github.com/dylle1/chenchen-birthday/releases/download/v1.0/chenchen-birthday.mp4" type="video/mp4">
+<video id="v" autoplay playsinline preload="auto" x5-video-player-type="h5" x5-video-player-fullscreen="true" webkit-playsinline="true">
+<source src="video.mp4" type="video/mp4">
 </video>
 <script>
 var v=document.getElementById('v');
-v.play().catch(function(){
-  v.muted=true;
-  v.play();
-});
+function tryPlay(){
+  v.play().catch(function(e){
+    console.log('play error:',e);
+    v.muted=true;
+    v.play().catch(function(){});
+  });
+}
+tryPlay();
 v.addEventListener('canplay',function(){
   if(v.muted){
     setTimeout(function(){
       v.muted=false;
-      v.play().catch(function(){});
-    },500);
+      tryPlay();
+    },800);
   }
 });
-document.documentElement.addEventListener('touchstart',function(){},false);
-document.documentElement.addEventListener('click',function(){
+v.addEventListener('loadeddata',function(){
+  var t=v.currentTime;
+  if(t===0&&!v.paused) return;
+});
+document.addEventListener('touchstart',function(){tryPlay();},false);
+document.addEventListener('click',function(){
   v.muted=false;
-  v.play();
+  tryPlay();
 },false);
+document.addEventListener('WeixinJSBridgeReady',function(){
+  tryPlay();
+},false);
+if(typeof WeixinJSBridge!=='undefined'){
+  WeixinJSBridge.invoke('getNetworkType',{},function(e){tryPlay();});
+}
 </script>
 </body>
 </html>
